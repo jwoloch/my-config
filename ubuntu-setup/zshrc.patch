@@ -1,0 +1,14 @@
+diff --git a/zshrc b/zshrc
+index 72b9981..18815ce 100644
+--- a/zshrc
++++ b/zshrc
+@@ -9,6 +9,9 @@ bindkey -e
+ 
+ zstyle :compinstall filename '~/.zshrc'
+ 
++[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
++source ~/.zshrc.local
++
+ autoload -Uz compinit
+ autoload -U colors && colors
+ compinit

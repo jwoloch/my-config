@@ -1,0 +1,108 @@
+#!/bin/bash
+
+TOP="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+update_only=0
+common_only=0
+
+for opt in "$@"; do
+  case $opt in
+    --update-only)
+      update_only=1
+      ;;
+    --common-only)
+      common_only=1
+      ;;
+  esac
+done
+
+upgrade_system () {
+	sudo apt update
+	sudo apt -y upgrade
+}
+
+install_common_apps () {
+	sudo apt install -y vim byobu zsh git golang curl snapd gnome-tweaks
+	
+	sudo snap install spotify
+	
+	# Install VS Code
+	curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+	sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
+	sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+
+	sudo apt-get install apt-transport-https
+	sudo apt-get update
+	sudo apt-get install code # or code-insiders
+
+	# Install Franz
+	dpkg -l franz
+	if [ ! $? -eq 0 ]; then
+		franz_package="franz_5.0.0-beta.18_amd64.deb"
+		wget https://github.com/meetfranz/franz/releases/download/v5.0.0-beta.18/$franz_package
+		sudo dpkg -i $franz_package || true
+		sudo apt --fix-broken install
+		rm $franz_package
+	fi
+}
+
+install_kde_i3 () {
+	sudo apt install tasksel
+	sudo tasksel install kubuntu-desktop
+	sudo apt install -y nitrogen fswebcam xcompmgr i3 i3lock scrot imagemagick
+	
+	mkdir -p /home/jwoloch/.config/plasma-workspace/env
+	echo "export KDEWM=/usr/bin/i3" > ~/.config/plasma-workspace/env/set_window_manager.sh
+	
+	if [ ! -d $HOME/.i3-plasma ]; then
+		git clone https://github.com/nightsh/i3-plasma.git $HOME/.i3-plasma
+	fi
+	
+	mkdir -p $HOME/.local/bin
+	mkdir -p $HOME/.i3
+	
+	ln -sf $HOME/.i3-plasma/config $HOME/.i3/
+	ln -sf $HOME/.i3-plasma/.local/bin/* $HOME/.local/bin/
+}
+
+install_zsh () {
+	if [ ! -d $HOME/zsh-config ]; then
+		git clone https://bitbucket.org/Vifon/zsh-config.git $HOME/zsh-config
+	fi
+
+	sudo apt install -y zsh git ranger
+
+	if [ "$(basename $(echo $SHELL))" != "zsh" ]; then
+		chsh -s $(which zsh)
+	fi
+
+	if [ ! -d $HOME/.fzf ]; then
+		git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
+	fi
+	~/.fzf/install --all
+
+	cd $HOME/zsh-config
+	git submodule update --init
+	./install.sh
+
+	rm -f $HOME/.zshrc.local
+	cp $TOP/.zshrc.local $HOME/.zshrc.local
+	cd $(dirname $(readlink -f ~/.zshrc))
+	git apply $TOP/zshrc.patch || true
+}
+
+if [ "$update_only" -eq 1 ] ; then
+	upgrade_system
+	exit 0
+fi
+
+if [ "$common_only" -eq 1 ] ; then
+	install_common_apps
+	exit 0
+fi
+
+upgrade_system
+install_common_apps
+install_zsh
+
+
