@@ -21,8 +21,28 @@ upgrade_system () {
 	sudo apt -y upgrade
 }
 
+install_docker () {
+	sudo apt-get install \
+		apt-transport-https \
+		ca-certificates \
+		curl \
+		software-properties-common
+
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+	sudo add-apt-repository \
+		"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+		$(lsb_release -cs) \
+		stable"
+
+	sudo apt update
+	sudo apt install -y docker-ce
+	sudo groupadd docker || true
+	sudo usermod -aG docker $USER
+}
+
 install_common_apps () {
-	sudo apt install -y vim byobu zsh git golang curl snapd gnome-tweaks
+	sudo apt install -y vim byobu zsh git golang curl snapd gnome-tweaks python-pip
 	
 	sudo snap install spotify
 	
@@ -104,5 +124,6 @@ fi
 upgrade_system
 install_common_apps
 install_zsh
+install_docker
 
 
