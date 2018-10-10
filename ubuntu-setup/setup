@@ -42,7 +42,7 @@ install_docker () {
 }
 
 install_common_apps () {
-	sudo apt install -y vim byobu zsh git golang curl snapd gnome-tweaks python-pip
+	sudo apt install -y vim byobu zsh git golang curl snapd gnome-tweaks python-pip htop
 	
 	sudo snap install spotify
 	
