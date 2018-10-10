@@ -22,7 +22,7 @@ upgrade_system () {
 }
 
 install_docker () {
-	sudo apt-get install \
+	sudo apt-get install -y \
 		apt-transport-https \
 		ca-certificates \
 		curl \
@@ -51,9 +51,9 @@ install_common_apps () {
 	sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
 	sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
 
-	sudo apt-get install apt-transport-https
-	sudo apt-get update
-	sudo apt-get install code # or code-insiders
+	sudo apt install -y apt-transport-https
+	sudo apt update
+	sudo apt install -y code # or code-insiders
 
 	# Install Franz
 	dpkg -l franz
@@ -90,7 +90,7 @@ install_zsh () {
 		git clone https://bitbucket.org/Vifon/zsh-config.git $HOME/zsh-config
 	fi
 
-	sudo apt install -y zsh git ranger
+	sudo apt install -y git ranger
 
 	if [ "$(basename $(echo $SHELL))" != "zsh" ]; then
 		chsh -s $(which zsh)
@@ -104,6 +104,8 @@ install_zsh () {
 	cd $HOME/zsh-config
 	git submodule update --init
 	./install.sh
+
+	sudo apt install -y zsh
 
 	rm -f $HOME/.zshrc.local
 	cp $TOP/.zshrc.local $HOME/.zshrc.local
