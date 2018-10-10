@@ -86,11 +86,16 @@ install_kde_i3 () {
 }
 
 install_zsh () {
+	sudo apt install -y git zsh ranger
+	
 	if [ ! -d $HOME/zsh-config ]; then
 		git clone https://bitbucket.org/Vifon/zsh-config.git $HOME/zsh-config
 	fi
 
-	sudo apt install -y git ranger
+	cd $HOME/zsh-config
+	git submodule update --init
+	./install.sh
+	
 
 	if [ "$(basename $(echo $SHELL))" != "zsh" ]; then
 		chsh -s $(which zsh)
@@ -100,12 +105,6 @@ install_zsh () {
 		git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
 	fi
 	~/.fzf/install --all
-
-	cd $HOME/zsh-config
-	git submodule update --init
-	./install.sh
-
-	sudo apt install -y zsh
 
 	rm -f $HOME/.zshrc.local
 	cp $TOP/.zshrc.local $HOME/.zshrc.local
