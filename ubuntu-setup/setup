@@ -21,6 +21,10 @@ upgrade_system () {
 	sudo apt -y upgrade
 }
 
+install_go () {
+	wget -qO- https://dl.google.com/go/go1.11.1.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
+}
+
 install_docker () {
 	sudo apt-get install -y \
 		apt-transport-https \
@@ -41,8 +45,15 @@ install_docker () {
 	sudo usermod -aG docker $USER
 }
 
+install_chrome() {
+	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+	echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
+	sudo apt update
+	sudo apt install -y google-chrome-stable
+}
+
 install_common_apps () {
-	sudo apt install -y vim byobu zsh git golang curl snapd gnome-tweaks python-pip htop
+	sudo apt install -y vim byobu zsh git curl snapd gnome-tweaks python-pip htop
 	
 	sudo snap install spotify
 	
@@ -50,6 +61,7 @@ install_common_apps () {
 	curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
 	sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
 	sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+	rm microsoft.gpg
 
 	sudo apt install -y apt-transport-https
 	sudo apt update
@@ -64,25 +76,6 @@ install_common_apps () {
 		sudo apt --fix-broken install
 		rm $franz_package
 	fi
-}
-
-install_kde_i3 () {
-	sudo apt install tasksel
-	sudo tasksel install kubuntu-desktop
-	sudo apt install -y nitrogen fswebcam xcompmgr i3 i3lock scrot imagemagick
-	
-	mkdir -p /home/jwoloch/.config/plasma-workspace/env
-	echo "export KDEWM=/usr/bin/i3" > ~/.config/plasma-workspace/env/set_window_manager.sh
-	
-	if [ ! -d $HOME/.i3-plasma ]; then
-		git clone https://github.com/nightsh/i3-plasma.git $HOME/.i3-plasma
-	fi
-	
-	mkdir -p $HOME/.local/bin
-	mkdir -p $HOME/.i3
-	
-	ln -sf $HOME/.i3-plasma/config $HOME/.i3/
-	ln -sf $HOME/.i3-plasma/.local/bin/* $HOME/.local/bin/
 }
 
 install_zsh () {
@@ -126,5 +119,5 @@ upgrade_system
 install_common_apps
 install_zsh
 install_docker
-
-
+install_chrome
+install_go
