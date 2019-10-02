@@ -1,20 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 TOP="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-
-update_only=0
-common_only=0
-
-for opt in "$@"; do
-  case $opt in
-    --update-only)
-      update_only=1
-      ;;
-    --common-only)
-      common_only=1
-      ;;
-  esac
-done
 
 upgrade_system () {
 	sudo apt update
@@ -53,7 +39,7 @@ install_chrome() {
 }
 
 install_common_apps () {
-	sudo apt install -y vim byobu zsh git curl snapd gnome-tweaks python-pip htop
+	sudo apt install -y vim byobu git curl snapd gnome-tweaks htop
 	
 	sudo snap install spotify
 	
@@ -65,13 +51,14 @@ install_common_apps () {
 
 	sudo apt install -y apt-transport-https
 	sudo apt update
-	sudo apt install -y code # or code-insiders
+	sudo apt install -y code
 
 	# Install Franz
 	dpkg -l franz
 	if [ ! $? -eq 0 ]; then
-		franz_package="franz_5.0.0-beta.18_amd64.deb"
-		wget https://github.com/meetfranz/franz/releases/download/v5.0.0-beta.18/$franz_package
+		franz_version="5.3.3"
+		franz_package="franz_${franz_version}_amd64.deb"
+		wget "https://github.com/meetfranz/franz/releases/download/v${franz_version}/${franz_package}"
 		sudo dpkg -i $franz_package || true
 		sudo apt --fix-broken install
 		rm $franz_package
@@ -98,26 +85,32 @@ install_zsh () {
 		git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
 	fi
 	~/.fzf/install --all
+	[ ! -f $HOME/.zshrc.local ] && cp $TOP/.zshrc.local $HOME/.zshrc.local
+        cd $(dirname $(readlink -f ~/.zshrc))
+        git apply $TOP/zshrc.patch || true
 
-	rm -f $HOME/.zshrc.local
-	cp $TOP/.zshrc.local $HOME/.zshrc.local
-	cd $(dirname $(readlink -f ~/.zshrc))
-	git apply $TOP/zshrc.patch || true
 }
 
-if [ "$update_only" -eq 1 ] ; then
-	upgrade_system
-	exit 0
-fi
+for opt in "$@"; do
+  case $opt in
+    --upgrade)
+      upgrade_system
+      ;;
+    --common)
+      install_common_apps
+      ;;
+    --go)
+      install_go
+      ;;
+    --docker)
+      install_docker
+      ;;
+    --chrome)
+      install_chrome
+      ;;
+    --zsh)
+      install_zsh
+      ;;
+  esac
+done
 
-if [ "$common_only" -eq 1 ] ; then
-	install_common_apps
-	exit 0
-fi
-
-upgrade_system
-install_common_apps
-install_zsh
-install_docker
-install_chrome
-install_go
