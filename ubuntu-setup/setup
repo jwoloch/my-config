@@ -2,13 +2,19 @@
 
 TOP="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
+ensure_line() {
+	if ! grep -q "$1" "$2"; then
+		echo "$1" >> "$2"
+	fi
+}
+
 upgrade_system () {
 	sudo apt update
 	sudo apt -y upgrade
 }
 
 install_go () {
-	wget -qO- https://dl.google.com/go/go1.11.1.linux-amd64.tar.gz | sudo tar -xz -C /usr/local
+	sudo snap install go --channel=1.14/stable --classic
 }
 
 install_docker () {
@@ -32,37 +38,15 @@ install_docker () {
 }
 
 install_chrome() {
-	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-	echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
-	sudo apt update
-	sudo apt install -y google-chrome-stable
+	sudo snap install chromium
 }
 
 install_common_apps () {
 	sudo apt install -y vim byobu git curl snapd gnome-tweaks htop
 	
 	sudo snap install spotify
-	
-	# Install VS Code
-	curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-	sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
-	sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
-	rm microsoft.gpg
-
-	sudo apt install -y apt-transport-https
-	sudo apt update
-	sudo apt install -y code
-
-	# Install Franz
-	dpkg -l franz
-	if [ ! $? -eq 0 ]; then
-		franz_version="5.3.3"
-		franz_package="franz_${franz_version}_amd64.deb"
-		wget "https://github.com/meetfranz/franz/releases/download/v${franz_version}/${franz_package}"
-		sudo dpkg -i $franz_package || true
-		sudo apt --fix-broken install
-		rm $franz_package
-	fi
+	sudo snap install code --classic
+	sudo snap install rambox
 }
 
 install_zsh () {
