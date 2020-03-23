@@ -18,23 +18,9 @@ install_go () {
 }
 
 install_docker () {
-	sudo apt-get install -y \
-		apt-transport-https \
-		ca-certificates \
-		curl \
-		software-properties-common
-
-	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-
-	sudo add-apt-repository \
-		"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-		$(lsb_release -cs) \
-		stable"
-
-	sudo apt update
-	sudo apt install -y docker-ce
-	sudo groupadd docker || true
-	sudo usermod -aG docker $USER
+	sudo apt-get install -y curl
+	sh -c "$(curl -sSL https://get.docker.com/)"
+	sudo usermod -aG docker "${USER}"
 }
 
 install_chrome() {
@@ -42,11 +28,13 @@ install_chrome() {
 }
 
 install_common_apps () {
-	sudo apt install -y vim byobu git curl snapd gnome-tweaks htop
+	sudo apt install -y vim byobu git curl snapd gnome-tweaks htop net-tools nmap
 	
 	sudo snap install spotify
 	sudo snap install code --classic
 	sudo snap install rambox
+	sudo snap install goland --classic
+	sudo snap install pycharm-professional --classic
 }
 
 install_zsh () {
