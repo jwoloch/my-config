@@ -35,6 +35,7 @@ install_common_apps () {
 	sudo snap install spotify
 	sudo snap install code --classic
 	sudo snap install rambox
+	sudo snap install keepassxc
 	sudo snap install goland --classic
 	sudo snap install pycharm-professional --classic
 }
