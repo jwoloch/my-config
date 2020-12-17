@@ -14,19 +14,22 @@ upgrade_system () {
 }
 
 install_go () {
-	sudo snap install go --channel=1.14/stable --classic
+	sudo snap install go --channel=1.15/stable --classic
 }
 
 install_docker () {
 	sudo apt-get install -y curl
 	sh -c "$(curl -sSL https://get.docker.com/)"
 	sudo usermod -aG docker "${USER}"
-	sudo curl -L "https://github.com/docker/compose/releases/download/1.25.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+	sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 	sudo chmod +x /usr/local/bin/docker-compose
 }
 
 install_chrome() {
-	sudo snap install chromium
+	wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+	sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+	sudo apt update
+	sudo apt install google-chrome-stable
 }
 
 install_common_apps () {
@@ -35,7 +38,6 @@ install_common_apps () {
 	sudo snap install spotify
 	sudo snap install code --classic
 	sudo snap install rambox
-	sudo snap install keepassxc
 	sudo snap install goland --classic
 	sudo snap install pycharm-professional --classic
 }
