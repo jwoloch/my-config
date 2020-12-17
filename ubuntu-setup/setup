@@ -33,7 +33,7 @@ install_chrome() {
 }
 
 install_common_apps () {
-	sudo apt install -y vim byobu git curl snapd gnome-tweaks htop net-tools nmap sshfs
+	sudo apt install -y vim byobu git curl snapd gnome-tweaks htop net-tools nmap sshfs sshpass
 	
 	sudo snap install spotify
 	sudo snap install code --classic
