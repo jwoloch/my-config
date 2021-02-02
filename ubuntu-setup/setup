@@ -13,33 +13,23 @@ upgrade_system () {
 	sudo apt -y upgrade
 }
 
-install_go () {
-	sudo snap install go --channel=1.15/stable --classic
-}
-
 install_docker () {
 	sudo apt-get install -y curl
 	sh -c "$(curl -sSL https://get.docker.com/)"
 	sudo usermod -aG docker "${USER}"
-	sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+	sudo curl -L "https://github.com/docker/compose/releases/download/1.28.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 	sudo chmod +x /usr/local/bin/docker-compose
 }
 
-install_chrome() {
-	wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-	sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-	sudo apt update
-	sudo apt install google-chrome-stable
-}
-
 install_common_apps () {
-	sudo apt install -y vim byobu git curl snapd gnome-tweaks htop net-tools nmap sshfs sshpass
+	sudo apt install -y vim byobu git curl gnome-tweaks htop net-tools nmap sshfs sshpass
 	
+	sudo snap install go --channel=1.15/stable --classic
 	sudo snap install spotify
-	sudo snap install code --classic
 	sudo snap install rambox
+	sudo snap install code --classic
+	sudo snap install pycharm-community --classic
 	sudo snap install goland --classic
-	sudo snap install pycharm-professional --classic
 }
 
 install_zsh () {
@@ -76,14 +66,8 @@ for opt in "$@"; do
     --common)
       install_common_apps
       ;;
-    --go)
-      install_go
-      ;;
     --docker)
       install_docker
-      ;;
-    --chrome)
-      install_chrome
       ;;
     --zsh)
       install_zsh
