@@ -14,15 +14,20 @@ upgrade_system () {
 }
 
 install_docker () {
-	sudo apt-get install -y curl
-	sh -c "$(curl -sSL https://get.docker.com/)"
+	sudo apt-get remove docker docker-engine docker.io containerd runc
+	sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && sudo apt-key fingerprint 0EBFCD88
+	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io
+	
 	sudo usermod -aG docker "${USER}"
+	
 	sudo curl -L "https://github.com/docker/compose/releases/download/1.28.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 	sudo chmod +x /usr/local/bin/docker-compose
 }
 
 install_common_apps () {
-	sudo apt install -y vim byobu git curl gnome-tweaks htop net-tools nmap sshfs sshpass
+	sudo apt install -y snapd vim byobu git curl gnome-tweaks htop net-tools nmap sshfs sshpass
 	
 	sudo snap install go --channel=1.15/stable --classic
 	sudo snap install spotify
@@ -30,6 +35,10 @@ install_common_apps () {
 	sudo snap install code --classic
 	sudo snap install pycharm-community --classic
 	sudo snap install goland --classic
+	sudo snap install chromium
+	sudo snap install cura-slicer
+	sudo snap connect cura-slicer:removable-media
+	sudo snap connect cura-slicer:mount-observe
 }
 
 install_zsh () {
