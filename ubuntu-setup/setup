@@ -13,43 +13,39 @@ upgrade_system () {
 	sudo apt -y upgrade
 }
 
+install_chrome() {
+	wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O /tmp/chrome.deb && sudo dpkg -i /tmp/chrome.deb
+}
+
 install_docker () {
-	sudo apt-get remove docker docker-engine docker.io containerd runc
-	sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - && sudo apt-key fingerprint 0EBFCD88
-	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-	sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io
-	
+	curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+	#cd /tmp
+	#git apply $TOP/get-docker.sh.patch
+	sudo sh /tmp/get-docker.sh
 	sudo usermod -aG docker "${USER}"
-	
-	sudo curl -L "https://github.com/docker/compose/releases/download/1.28.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-	sudo chmod +x /usr/local/bin/docker-compose
 }
 
 install_common_apps () {
-	sudo apt install -y snapd vim byobu git curl gnome-tweaks htop net-tools nmap sshfs sshpass
-	
-	sudo snap install go --channel=1.15/stable --classic
+	sudo apt install -y snapd vim byobu git curl htop net-tools nmap sshfs software-properties-common
+	sudo add-apt-repository -y ppa:appimagelauncher-team/stable
+	sudo apt install appimagelauncher
+
+	sudo snap install go --channel=1.18/stable --classic
 	sudo snap install spotify
 	sudo snap install rambox
 	sudo snap install code --classic
 	sudo snap install pycharm-community --classic
 	sudo snap install goland --classic
-	sudo snap install chromium
-	sudo snap install cura-slicer
-	sudo snap connect cura-slicer:removable-media
-	sudo snap connect cura-slicer:mount-observe
 }
 
 install_zsh () {
-	sudo apt install -y git zsh ranger
+	sudo apt install -y git zsh ranger tmux
 	
 	if [ ! -d $HOME/zsh-config ]; then
-		git clone https://bitbucket.org/Vifon/zsh-config.git $HOME/zsh-config
+		git clone --recurse-submodules https://bitbucket.org/Vifon/zsh-config.git $HOME/zsh-config
 	fi
 
 	cd $HOME/zsh-config
-	git submodule update --init
 	./install.sh
 	
 
@@ -80,6 +76,9 @@ for opt in "$@"; do
       ;;
     --zsh)
       install_zsh
+      ;;
+    --chrome)
+      install_chrome
       ;;
   esac
 done

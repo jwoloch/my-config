@@ -6,7 +6,6 @@ index 72b9981..18815ce 100644
  
  zstyle :compinstall filename '~/.zshrc'
  
-+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 +source ~/.zshrc.local
 +
  autoload -Uz compinit
