@@ -18,10 +18,7 @@ install_chrome() {
 }
 
 install_docker () {
-	curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
-	#cd /tmp
-	#git apply $TOP/get-docker.sh.patch
-	sudo sh /tmp/get-docker.sh
+	$TOP/docker-install/install.sh
 	sudo usermod -aG docker "${USER}"
 }
 

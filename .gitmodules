@@ -1,0 +1,3 @@
+[submodule "ubuntu-setup/docker-install"]
+	path = ubuntu-setup/docker-install
+	url = https://github.com/Jozmen/docker-install.git
